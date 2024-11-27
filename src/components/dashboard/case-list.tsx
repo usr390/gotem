@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Case } from '@/types';
 import {
@@ -10,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { Column, SortingState } from '@tanstack/react-table';
 
 interface CaseListProps {
   cases: Case[];
@@ -24,6 +26,48 @@ const statusColors = {
 };
 
 export function CaseList({ cases, onSelectCase }: CaseListProps) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  const toggleSort = (columnId: keyof Case) => {
+    setSorting(current => {
+      // If clicking the same column that's already sorted
+      if (current[0]?.id === columnId) {
+        // If ascending, make it descending
+        if (!current[0].desc) {
+          return [{ id: columnId, desc: true }];
+        }
+        // If descending, remove sort
+        return [];
+      }
+      // New column, set to ascending
+      return [{ id: columnId, desc: false }];
+    });
+  };
+
+  // Sort the cases
+  const sortedCases = useMemo(() => {
+    return [...cases].sort((a, b) => {
+      const [sort] = sorting;
+      if (!sort) return 0;
+
+      // Special handling for submittedBy
+      if (sort.id === 'submittedBy') {
+        const aVal = a.submittedBy.name;
+        const bVal = b.submittedBy.name;
+        return sort.desc 
+          ? bVal.localeCompare(aVal) 
+          : aVal.localeCompare(bVal);
+      }
+
+      // Normal sorting for other columns
+      const aVal = String(a[sort.id as keyof Case] ?? '');
+      const bVal = String(b[sort.id as keyof Case] ?? '');
+      return sort.desc 
+        ? bVal.localeCompare(aVal) 
+        : aVal.localeCompare(bVal);
+    });
+  }, [cases, sorting]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -33,15 +77,28 @@ export function CaseList({ cases, onSelectCase }: CaseListProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Case Title</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Submitted By</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead>Last Updated</TableHead>
+            <TableHead 
+              onClick={() => toggleSort('title')} 
+              className="cursor-pointer"
+            >
+              Title {sorting[0]?.id === 'title' && (sorting[0]?.desc ? ' ↓' : ' ↑')}
+            </TableHead>
+            <TableHead onClick={() => toggleSort('status')} className="cursor-pointer">
+              Status {sorting[0]?.id === 'status' && (sorting[0]?.desc ? '↓' : '↑')}
+            </TableHead>
+            <TableHead onClick={() => toggleSort('submittedBy')} className="cursor-pointer">
+              Submitted By {sorting[0]?.id === 'submittedBy' && (sorting[0]?.desc ? '↓' : '↑')}
+            </TableHead>
+            <TableHead onClick={() => toggleSort('createdAt')} className="cursor-pointer">
+              Created {sorting[0]?.id === 'createdAt' && (sorting[0]?.desc ? '↓' : '↑')}
+            </TableHead>
+            <TableHead onClick={() => toggleSort('updatedAt')} className="cursor-pointer">
+              Last Updated {sorting[0]?.id === 'updatedAt' && (sorting[0]?.desc ? '↓' : '↑')}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {cases.map((caseItem) => (
+          {sortedCases.map((caseItem) => (
             <TableRow
               key={caseItem.id}
               className="cursor-pointer hover:bg-muted/50"
