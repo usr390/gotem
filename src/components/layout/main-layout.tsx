@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { UserCircle, Settings, LayoutDashboard, Users, LogOut } from 'lucide-react';
 import { Toaster } from "@/components/ui/toaster";
+import { CommandMenu } from "@/components/command-menu"
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -64,6 +65,11 @@ export function MainLayout({ children }: MainLayoutProps) {
         {/* Main content */}
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto p-6">
+            <header className="border-b">
+              <div className="flex items-center h-16">
+                <CommandMenu />
+              </div>
+            </header>
             {children}
           </div>
         </main>
