@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { X, Upload, File, Image, Video, Loader2, CheckCircle2, AudioLines } from 'lucide-react';
+import { Upload, File, Video, Loader2, CheckCircle2, AudioLines } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,6 +8,12 @@ import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogHeader,
+} from "@/components/ui/dialog"
 
 interface NewCaseFormProps {
   onClose: () => void;
@@ -194,29 +200,12 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center"
-    >
-      <motion.div
-        initial={{ scale: 0.95 }}
-        animate={{ scale: 1 }}
-        exit={{ scale: 0.95 }}
-        className="bg-card text-card-foreground rounded-lg border shadow-lg p-6 w-full max-w-lg relative"
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-4 top-4 text-muted-foreground hover:text-foreground"
-          onClick={onClose}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-
-        <h2 className="text-2xl font-bold text-foreground mb-4">New Case</h2>
-
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Create New Case</DialogTitle>
+        </DialogHeader>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-muted-foreground mb-1">
@@ -345,7 +334,7 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
             <Button type="submit">Create Case</Button>
           </div>
         </form>
-      </motion.div>
-    </motion.div>
+      </DialogContent>
+    </Dialog>
   );
 }

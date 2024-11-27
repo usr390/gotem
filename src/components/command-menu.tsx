@@ -9,8 +9,10 @@ import {
 } from "@/components/ui/command"
 import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
 
 export function CommandMenu() {
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -47,21 +49,43 @@ export function CommandMenu() {
           <CommandEmpty>No results found.</CommandEmpty>
           
           <CommandGroup heading="Quick Actions">
-            <CommandItem>Create New Case</CommandItem>
-            <CommandItem>View Recent Cases</CommandItem>
-            <CommandItem>View My Cases</CommandItem>
+            <CommandItem               
+                onSelect={() => {
+                  if (window.location.pathname !== '/dashboard') {
+                    navigate('/dashboard');
+                  }
+                  window.location.hash = 'create-new-case';
+                  setOpen(false);
+                }}>
+                Create New Case
+            </CommandItem>
           </CommandGroup>
 
           <CommandGroup heading="Navigation">
-            <CommandItem>Dashboard</CommandItem>
-            <CommandItem>Cases</CommandItem>
-            <CommandItem>Reports</CommandItem>
-          </CommandGroup>
-
-          <CommandGroup heading="Settings">
-            <CommandItem>Profile Settings</CommandItem>
-            <CommandItem>Notification Preferences</CommandItem>
-            <CommandItem>System Settings</CommandItem>
+            <CommandItem
+              onSelect={() => {
+                navigate("/dashboard")
+                setOpen(false)
+              }}
+            >
+              Dashboard
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                navigate("/profile")
+                setOpen(false)
+              }}
+            >
+              Profile
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                navigate("/settings")
+                setOpen(false)
+              }}
+            >
+              Settings
+            </CommandItem>
           </CommandGroup>
         </CommandList>
       </CommandDialog>
