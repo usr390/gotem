@@ -15,16 +15,7 @@ export interface Case {
   assignedTo?: User;
   createdAt: string;
   updatedAt: string;
-  documents?: Document[];
-}
-
-export interface Document {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  uploadedAt: string;
-  uploadedBy: User;
+  evidence?: Evidence[];
 }
 
 export interface Message {
@@ -40,4 +31,15 @@ export interface Activity {
   description: string;
   timestamp: string;
   type: 'case_creation' | 'case_update' | 'message' | 'document_upload' | 'profile_update';
+}
+
+interface Evidence {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
+  uploadedBy: User;
+  url: string;
+  thumbnail?: string;
 }

@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { useState } from 'react';
 import { MOCK_MESSAGES } from '@/lib/mock-data';
 import { useAuth } from '@/contexts/auth-context';
-import { X } from 'lucide-react';
+import { X, FileIcon } from 'lucide-react';
 
 interface CaseDetailsProps {
   caseItem: Case;
@@ -18,6 +18,8 @@ export function CaseDetails({ caseItem, onClose }: CaseDetailsProps) {
   const [messages] = useState<Message[]>(MOCK_MESSAGES);
   const [newMessage, setNewMessage] = useState('');
   const { user } = useAuth();
+
+  const evidence = caseItem.evidence || [];
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -66,6 +68,32 @@ export function CaseDetails({ caseItem, onClose }: CaseDetailsProps) {
               </dd>
             </div>
           </dl>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="font-semibold">Evidence</h3>
+          <div className="rounded-lg border p-4">
+            {evidence.length ? (
+              <div className="space-y-2">
+                {evidence.map((evidence) => (
+                  <div key={evidence.id} className="flex items-center gap-2 text-sm hover:bg-muted p-2 rounded-md">
+                    {evidence.type === 'image' ? (
+                      <img 
+                        src={evidence.thumbnail} 
+                        alt={evidence.name}
+                        className="h-8 w-8 object-cover rounded"
+                      />
+                    ) : (
+                      <FileIcon className="h-4 w-4" />
+                    )}
+                    <a href={evidence.url} className="hover:underline">{evidence.name}</a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No evidence uploaded yet</p>
+            )}
+          </div>
         </div>
 
         <div className="space-y-4">

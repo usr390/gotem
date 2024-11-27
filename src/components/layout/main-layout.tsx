@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { UserCircle, Settings, LayoutDashboard, Users, LogOut } from 'lucide-react';
+import { Toaster } from "@/components/ui/toaster";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -67,6 +68,7 @@ export function MainLayout({ children }: MainLayoutProps) {
           </div>
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }

@@ -4,22 +4,74 @@ import { DEMO_USERS } from './constants';
 export const MOCK_CASES: Case[] = [
   {
     id: '1',
-    title: 'Robbery at 123 Main St',
-    description: 'Armed robbery at convenience store',
+    title: 'Server Outage Report',
+    description: 'Investigation into recent server downtime',
     status: 'pending',
-    submittedBy: DEMO_USERS.police,
-    createdAt: '2024-03-15T10:00:00Z',
-    updatedAt: '2024-03-15T10:00:00Z',
+    submittedBy: { 
+      id: '1', 
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      role: 'police_officer'
+    },
+    createdAt: '2024-03-20T10:00:00Z',
+    updatedAt: '2024-03-20T10:00:00Z',
+    evidence: [
+      { 
+        id: '1', 
+        name: 'server-logs.pdf',
+        url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
+        type: 'pdf',
+        thumbnail: 'https://placehold.co/50x50/png?text=PDF',
+        size: 1024000,
+        uploadedAt: '2024-03-20T10:00:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '2',
+        name: 'error-screenshot.png',
+        url: 'https://picsum.photos/200',
+        type: 'image',
+        thumbnail: 'https://picsum.photos/50/50',
+        size: 512000,
+        uploadedAt: '2024-03-20T10:00:00Z',
+        uploadedBy: DEMO_USERS.police
+      }
+    ]
   },
   {
     id: '2',
-    title: 'Vehicle Theft Investigation',
-    description: 'Stolen vehicle recovered, suspect in custody',
+    title: 'Security Breach Alert',
+    description: 'Potential unauthorized access detected',
     status: 'under_review',
-    submittedBy: DEMO_USERS.police,
-    assignedTo: DEMO_USERS.prosecutor,
-    createdAt: '2024-03-14T15:30:00Z',
-    updatedAt: '2024-03-15T09:00:00Z',
+    submittedBy: { 
+      id: '2', 
+      name: 'Jane Smith',
+      email: 'jane.smith@example.com',
+      role: 'police_officer'
+    },
+    createdAt: '2024-03-19T15:30:00Z',
+    updatedAt: '2024-03-19T15:30:00Z',
+    evidence: [
+      {
+        id: '3',
+        name: 'access-logs.txt',
+        url: '#',
+        type: 'text',
+        size: 256000,
+        uploadedAt: '2024-03-19T15:30:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '4',
+        name: 'security-report.pdf',
+        url: '#',
+        type: 'pdf',
+        thumbnail: 'https://placehold.co/50x50/png?text=PDF',
+        size: 384000,
+        uploadedAt: '2024-03-19T15:30:00Z',
+        uploadedBy: DEMO_USERS.police
+      }
+    ]
   },
   {
     id: '3',
@@ -30,6 +82,18 @@ export const MOCK_CASES: Case[] = [
     assignedTo: DEMO_USERS.prosecutor,
     createdAt: '2024-03-13T20:15:00Z',
     updatedAt: '2024-03-15T11:30:00Z',
+    evidence: [
+      {
+        id: '5',
+        name: 'incident-report.pdf',
+        url: '#',
+        type: 'pdf',
+        thumbnail: 'https://placehold.co/50x50/png?text=PDF',
+        size: 512000,
+        uploadedAt: '2024-03-13T20:15:00Z',
+        uploadedBy: DEMO_USERS.police
+      }
+    ]
   },
 ];
 
