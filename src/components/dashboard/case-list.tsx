@@ -30,22 +30,6 @@ const statusColors = {
 export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const toggleSort = (columnId: keyof Case) => {
-    setSorting(current => {
-      // If clicking the same column that's already sorted
-      if (current[0]?.id === columnId) {
-        // If ascending, make it descending
-        if (!current[0].desc) {
-          return [{ id: columnId, desc: true }];
-        }
-        // If descending, remove sort
-        return [];
-      }
-      // New column, set to ascending
-      return [{ id: columnId, desc: false }];
-    });
-  };
-
   // Sort the cases
   const sortedCases = useMemo(() => {
     return [...cases].sort((a, b) => {
@@ -69,6 +53,22 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         : aVal.localeCompare(bVal);
     });
   }, [cases, sorting]);
+
+  const toggleSort = (columnId: keyof Case) => {
+    setSorting(current => {
+      // If clicking the same column that's already sorted
+      if (current[0]?.id === columnId) {
+        // If ascending, make it descending
+        if (!current[0].desc) {
+          return [{ id: columnId, desc: true }];
+        }
+        // If descending, remove sort
+        return [];
+      }
+      // New column, set to ascending
+      return [{ id: columnId, desc: false }];
+    });
+  };
 
   return (
     <motion.div
@@ -110,6 +110,15 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
                   : "hover:bg-muted/50"
               )}
               onClick={() => onSelectCase(caseItem)}
+              tabIndex={0}
+              role="row"
+              aria-selected={selectedCaseId === caseItem.id}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectCase(caseItem);
+                }
+              }}
             >
               <TableCell className="font-medium">{caseItem.title}</TableCell>
               <TableCell>
