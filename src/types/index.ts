@@ -10,12 +10,13 @@ export interface Case {
   id: string;
   title: string;
   description: string;
-  status: 'pending' | 'under_review' | 'approved' | 'rejected';
+  status: 'submitted' | 'approved' | 'review' | 'dropped';
   submittedBy: User;
   assignedTo?: User;
   createdAt: string;
   updatedAt: string;
   evidence?: Evidence[];
+  audit: Audit[];
 }
 
 export interface Message {
@@ -42,4 +43,13 @@ interface Evidence {
   uploadedBy: User;
   url: string;
   thumbnail?: string;
+}
+
+interface Audit {
+  id: string;
+  action: string;
+  timestamp: string;
+  userId: string;
+  userName: string;
+  details?: string;
 }

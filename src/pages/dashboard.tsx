@@ -72,7 +72,11 @@ export function DashboardPage() {
       </div>
 
       <div className="grid gap-6">
-        <CaseList cases={cases} onSelectCase={setSelectedCase} />
+        <CaseList 
+          cases={cases} 
+          onSelectCase={setSelectedCase} 
+          selectedCaseId={selectedCase?.id}
+        />
       </div>
 
       <AnimatePresence>

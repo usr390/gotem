@@ -11,21 +11,23 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { Column, SortingState } from '@tanstack/react-table';
+import { SortingState } from '@tanstack/react-table';
+import { cn } from '@/lib/utils';
 
 interface CaseListProps {
   cases: Case[];
   onSelectCase: (caseItem: Case) => void;
+  selectedCaseId?: string;
 }
 
 const statusColors = {
-  pending: 'bg-yellow-500',
-  under_review: 'bg-blue-500',
+  submitted: 'bg-black-500',
+  review: 'bg-yellow-500',
   approved: 'bg-green-500',
-  rejected: 'bg-red-500',
+  dropped: 'bg-red-500',
 };
 
-export function CaseList({ cases, onSelectCase }: CaseListProps) {
+export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const toggleSort = (columnId: keyof Case) => {
@@ -101,7 +103,12 @@ export function CaseList({ cases, onSelectCase }: CaseListProps) {
           {sortedCases.map((caseItem) => (
             <TableRow
               key={caseItem.id}
-              className="cursor-pointer hover:bg-muted/50"
+              className={cn(
+                "cursor-pointer",
+                selectedCaseId === caseItem.id 
+                  ? "bg-primary/10 hover:bg-primary/20"
+                  : "hover:bg-muted/50"
+              )}
               onClick={() => onSelectCase(caseItem)}
             >
               <TableCell className="font-medium">{caseItem.title}</TableCell>

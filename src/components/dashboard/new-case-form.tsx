@@ -21,6 +21,7 @@ interface NewCaseFormProps {
     title: string; 
     description: string;
     files: FileWithProgress[];
+    audit: Audit[];
   }) => Promise<void>;
 }
 
@@ -28,6 +29,15 @@ interface FileWithProgress extends File {
   progress: number;
   uploading: boolean;
   completed: boolean;
+}
+
+interface Audit {
+  id: string;
+  action: string;
+  timestamp: string;
+  userId: string;
+  userName: string;
+  details?: string;
 }
 
 export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
@@ -131,9 +141,29 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
     e.preventDefault();
     try {
       console.log('Starting uploads...');
+      
+      const currentUser = {
+        id: "user-1", // You would get this from your auth context
+        name: "John Doe",
+        email: "john.doe@police.gov",
+        role: "police_officer",
+      };
+
+      const timestamp = new Date().toISOString();
+      
       await onSubmit({
         ...formData,
-        files
+        files,
+        audit: [
+          {
+            id: crypto.randomUUID(),
+            action: 'CASE_SUBMITTED',
+            timestamp,
+            userId: currentUser.id,
+            userName: currentUser.name,
+            details: `Case submitted`
+          }
+        ]
       });
       
       console.log('Upload completed, showing success toast');

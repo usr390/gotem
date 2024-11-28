@@ -6,7 +6,7 @@ export const MOCK_CASES: Case[] = [
     id: '1',
     title: 'Server Outage Report',
     description: 'Investigation into recent server downtime',
-    status: 'pending',
+    status: 'submitted',
     submittedBy: { 
       id: '1', 
       name: 'John Doe',
@@ -36,13 +36,31 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-20T10:00:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-20T10:00:00Z',
+        userId: '1',
+        userName: 'John Doe',
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-20T10:00:00Z',
+        userId: '1',
+        userName: 'John Doe',
+        details: 'Added server-logs.pdf and error-screenshot.png'
+      }
     ]
   },
   {
     id: '2',
     title: 'Security Breach Alert',
     description: 'Potential unauthorized access detected',
-    status: 'under_review',
+    status: 'review',
     submittedBy: { 
       id: '2', 
       name: 'Jane Smith',
@@ -71,6 +89,32 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-19T15:30:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-19T15:30:00Z',
+        userId: '2',
+        userName: 'Jane Smith',
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-19T16:45:00Z',
+        userId: '2',
+        userName: 'Jane Smith',
+        details: 'Status updated to under review'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-19T15:30:00Z',
+        userId: '2',
+        userName: 'Jane Smith',
+        details: 'Uploaded access logs and security report'
+      }
     ]
   },
   {
@@ -93,13 +137,47 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-13T20:15:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-13T20:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-13T20:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Incident report uploaded'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-15T11:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-15T11:30:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Case approved for prosecution'
+      }
     ]
   },
   {
     id: '4',
     title: 'Drug Possession Case #2024-04',
     description: 'Suspect found with controlled substances during traffic stop',
-    status: 'pending',
+    status: 'submitted',
     submittedBy: {
       id: '3',
       name: 'Mike Johnson',
@@ -118,13 +196,31 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-18T09:15:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-18T08:45:00Z',
+        userId: '3',
+        userName: 'Mike Johnson',
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-18T09:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added evidence photos archive'
+      }
     ]
   },
   {
     id: '5',
     title: 'Cyberstalking Investigation',
     description: 'Online harassment and threats via social media',
-    status: 'under_review',
+    status: 'review',
     submittedBy: DEMO_USERS.police,
     assignedTo: DEMO_USERS.prosecutor,
     createdAt: '2024-03-17T16:20:00Z',
@@ -148,6 +244,48 @@ export const MOCK_CASES: Case[] = [
         size: 125000,
         uploadedAt: '2024-03-17T16:50:00Z',
         uploadedBy: DEMO_USERS.police
+      }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-17T16:20:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-17T16:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added screenshot compilation'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-17T16:50:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added threat messages'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-19T09:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-19T09:30:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Case requires additional evidence - returned for review'
       }
     ]
   },
@@ -180,13 +318,55 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-16T11:45:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-16T11:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-16T11:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added recovery photos'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-16T12:00:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added damage assessment report'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-17T13:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-17T13:15:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Case approved'
+      }
     ]
   },
   {
     id: '7',
     title: 'Burglary #2024-07',
     description: 'Burglary incident reported at Downtown Business District',
-    status: 'pending',
+    status: 'submitted',
     submittedBy: DEMO_USERS.police,
     createdAt: '2024-03-15T09:30:00Z',
     updatedAt: '2024-03-15T09:30:00Z',
@@ -199,6 +379,32 @@ export const MOCK_CASES: Case[] = [
         size: 52428800,
         uploadedAt: '2024-03-15T09:45:00Z',
         uploadedBy: DEMO_USERS.police
+      }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-15T09:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-15T09:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added security footage'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-15T09:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted for review'
       }
     ]
   },
@@ -222,13 +428,47 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-14T23:30:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-14T23:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-14T23:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added breathalyzer report'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-15T10:00:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-15T10:30:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Case approved'
+      }
     ]
   },
   {
     id: '9',
     title: 'Vandalism #2024-09',
     description: 'Property damage at Central Park',
-    status: 'under_review',
+    status: 'review',
     submittedBy: DEMO_USERS.police,
     assignedTo: DEMO_USERS.prosecutor,
     createdAt: '2024-03-14T16:20:00Z',
@@ -243,13 +483,47 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-14T16:45:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-14T16:20:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-14T16:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added damage photos'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-14T18:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-14T18:45:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Additional witness statements needed - returned for review'
+      }
     ]
   },
   {
     id: '10',
     title: 'Fraud Case #2024-10',
     description: 'Credit card fraud at local business',
-    status: 'pending',
+    status: 'submitted',
     submittedBy: DEMO_USERS.police,
     createdAt: '2024-03-13T14:30:00Z',
     updatedAt: '2024-03-13T14:30:00Z',
@@ -264,13 +538,39 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-13T14:45:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-13T14:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-13T14:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added transaction records'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-13T14:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted for review'
+      }
     ]
   },
   {
     id: '11',
     title: 'Assault #2024-11',
     description: 'Physical altercation at shopping mall',
-    status: 'under_review',
+    status: 'review',
     submittedBy: DEMO_USERS.police,
     assignedTo: DEMO_USERS.prosecutor,
     createdAt: '2024-03-12T20:10:00Z',
@@ -285,6 +585,40 @@ export const MOCK_CASES: Case[] = [
         size: 3145728,
         uploadedAt: '2024-03-12T21:00:00Z',
         uploadedBy: DEMO_USERS.police
+      }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-12T20:10:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-12T21:00:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added witness statements'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-13T09:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-13T09:15:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Medical records required - returned for review'
       }
     ]
   },
@@ -307,13 +641,47 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-11T10:15:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-11T08:20:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-11T10:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added digital forensics archive'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-12T15:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-12T15:30:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Case approved'
+      }
     ]
   },
   {
     id: '13',
     title: 'Drug Possession #2024-13',
     description: 'Narcotics found during routine traffic stop',
-    status: 'pending',
+    status: 'submitted',
     submittedBy: DEMO_USERS.police,
     createdAt: '2024-03-10T22:45:00Z',
     updatedAt: '2024-03-10T22:45:00Z',
@@ -327,13 +695,39 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-10T23:00:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-10T22:45:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-10T23:00:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added evidence photos'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-10T23:00:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted for review'
+      }
     ]
   },
   {
     id: '14',
     title: 'Theft #2024-14',
     description: 'Shoplifting incident at East End Mall',
-    status: 'under_review',
+    status: 'review',
     submittedBy: DEMO_USERS.police,
     assignedTo: DEMO_USERS.prosecutor,
     createdAt: '2024-03-09T14:20:00Z',
@@ -347,6 +741,40 @@ export const MOCK_CASES: Case[] = [
         size: 104857600,
         uploadedAt: '2024-03-09T15:00:00Z',
         uploadedBy: DEMO_USERS.police
+      }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-09T14:20:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-09T15:00:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added surveillance footage'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-10T09:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-10T09:30:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Better quality surveillance footage needed - returned for review'
       }
     ]
   },
@@ -370,13 +798,47 @@ export const MOCK_CASES: Case[] = [
         uploadedAt: '2024-03-08T20:00:00Z',
         uploadedBy: DEMO_USERS.police
       }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-08T19:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-08T20:00:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added incident report'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'ASSIGNED',
+        timestamp: '2024-03-09T11:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: `Case assigned to ${DEMO_USERS.prosecutor.name}`
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-09T11:30:00Z',
+        userId: DEMO_USERS.prosecutor.id,
+        userName: DEMO_USERS.prosecutor.name,
+        details: 'Case approved'
+      }
     ]
   },
   {
     id: '16',
     title: 'Vandalism #2024-16',
     description: 'Graffiti damage to public property',
-    status: 'pending',
+    status: 'submitted',
     submittedBy: DEMO_USERS.police,
     createdAt: '2024-03-07T12:30:00Z',
     updatedAt: '2024-03-07T12:30:00Z',
@@ -390,6 +852,32 @@ export const MOCK_CASES: Case[] = [
         size: 4194304,
         uploadedAt: '2024-03-07T13:15:00Z',
         uploadedBy: DEMO_USERS.police
+      }
+    ],
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp: '2024-03-07T12:30:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-07T13:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Added damage assessment report'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'STATUS_CHANGED',
+        timestamp: '2024-03-07T13:15:00Z',
+        userId: DEMO_USERS.police.id,
+        userName: DEMO_USERS.police.name,
+        details: 'Case submitted for review'
       }
     ]
   }

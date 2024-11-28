@@ -1,30 +1,63 @@
 import { motion } from 'framer-motion';
-import { Case, Message } from '@/types';
+import { Case } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { MOCK_MESSAGES } from '@/lib/mock-data';
-import { useAuth } from '@/contexts/auth-context';
 import { X, FileIcon } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { ChevronDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { 
+  CheckCircle2, 
+  FileUp, 
+  RotateCcw, 
+  UserPlus, 
+  FileEdit 
+} from 'lucide-react';
 
 interface CaseDetailsProps {
   caseItem: Case;
   onClose: () => void;
 }
 
+// Update the helper function to return Lucide icons
+function getActionDetails(action: string) {
+  switch (action) {
+    case 'CASE_SUBMITTED':
+      return { icon: <CheckCircle2 className="h-4 w-4 text-green-500" />, color: 'text-green-500' };
+    case 'FILE_ADDED':
+      return { icon: <FileUp className="h-4 w-4 text-orange-500" />, color: 'text-orange-500' };
+    case 'STATUS_CHANGED':
+      return { icon: <RotateCcw className="h-4 w-4 text-blue-500" />, color: 'text-blue-500' };
+    case 'ASSIGNED':
+      return { icon: <UserPlus className="h-4 w-4 text-purple-500" />, color: 'text-purple-500' };
+    default:
+      return { icon: <FileEdit className="h-4 w-4 text-gray-500" />, color: 'text-gray-500' };
+  }
+}
+
 export function CaseDetails({ caseItem, onClose }: CaseDetailsProps) {
-  const [messages] = useState<Message[]>(MOCK_MESSAGES);
-  const [newMessage, setNewMessage] = useState('');
-  const { user } = useAuth();
 
   const evidence = caseItem.evidence || [];
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    // In a real app, this would send the message to the backend
-    setNewMessage('');
+  // Track open state for each section
+  const [openSections, setOpenSections] = useState({
+    description: true,
+    details: true,
+    evidence: true,
+    history: true,
+    messages: true,
+  });
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
   };
 
   return (
@@ -42,100 +75,135 @@ export function CaseDetails({ caseItem, onClose }: CaseDetailsProps) {
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 pt-0">
-        <div className="space-y-6">
-          <div>
-            <h3 className="font-semibold mb-2">Description</h3>
-            <p className="text-muted-foreground">{caseItem.description}</p>
-          </div>
+      <div className="flex-1 overflow-y-auto p-6 pt-0 pb-6">
+        <div className="space-y-2">
+          {/* Description Section */}
+          <Collapsible open={openSections.description}>
+            <CollapsibleTrigger 
+              onClick={() => toggleSection('description')}
+              className="flex items-center justify-between w-full py-4 hover:text-primary"
+            >
+              <h3 className="font-semibold">Description</h3>
+              <ChevronDown className={cn(
+                "h-4 w-4 transition-transform",
+                openSections.description ? "transform rotate-0" : "-rotate-90"
+              )} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pb-4">
+              <p className="text-muted-foreground pt-2">{caseItem.description}</p>
+            </CollapsibleContent>
+          </Collapsible>
 
-          <div>
-            <h3 className="font-semibold mb-2">Details</h3>
-            <dl className="space-y-2">
-              <div>
-                <dt className="text-sm text-muted-foreground">Status</dt>
-                <dd className="font-medium">
-                  {caseItem.status.replace('_', ' ').toUpperCase()}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm text-muted-foreground">Submitted By</dt>
-                <dd className="font-medium">{caseItem.submittedBy.name}</dd>
-              </div>
-              <div>
-                <dt className="text-sm text-muted-foreground">Created</dt>
-                <dd className="font-medium">
-                  {format(new Date(caseItem.createdAt), 'PPpp')}
-                </dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-semibold">Evidence</h3>
-            <div className="rounded-lg border p-4">
-              {evidence.length ? (
-                <div className="space-y-2">
-                  {evidence.map((evidence) => (
-                    <div key={evidence.id} className="flex items-center gap-2 text-sm hover:bg-muted p-2 rounded-md">
-                      {evidence.type === 'image' ? (
-                        <img 
-                          src={evidence.thumbnail} 
-                          alt={evidence.name}
-                          className="h-8 w-8 object-cover rounded"
-                        />
-                      ) : (
-                        <FileIcon className="h-4 w-4" />
-                      )}
-                      <a href={evidence.url} className="hover:underline">{evidence.name}</a>
-                    </div>
-                  ))}
+          {/* Details Section */}
+          <Collapsible open={openSections.details}>
+            <CollapsibleTrigger 
+              onClick={() => toggleSection('details')}
+              className="flex items-center justify-between w-full py-4 hover:text-primary"
+            >
+              <h3 className="font-semibold">Details</h3>
+              <ChevronDown className={cn(
+                "h-4 w-4 transition-transform",
+                openSections.details ? "transform rotate-0" : "-rotate-90"
+              )} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pb-4">
+              <dl className="space-y-2 pt-2">
+                <div>
+                  <dt className="text-sm text-muted-foreground">Status</dt>
+                  <dd className="font-medium">
+                    {caseItem.status.replace('_', ' ').toUpperCase()}
+                  </dd>
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No evidence uploaded yet</p>
-              )}
-            </div>
-          </div>
+                <div>
+                  <dt className="text-sm text-muted-foreground">Submitted By</dt>
+                  <dd className="font-medium">{caseItem.submittedBy.name}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm text-muted-foreground">Created</dt>
+                  <dd className="font-medium">
+                    {format(new Date(caseItem.createdAt), 'PPpp')}
+                  </dd>
+                </div>
+              </dl>
+            </CollapsibleContent>
+          </Collapsible>
 
-          <div className="space-y-4">
-            <h3 className="font-semibold">Messages</h3>
-            <ScrollArea className="h-[300px] pr-4">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex flex-col ${
-                      message.sender.id === user?.id ? 'items-end' : 'items-start'
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.sender.id === user?.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
-                      }`}
-                    >
-                      <p className="text-sm">{message.content}</p>
+          {/* Evidence Section */}
+          <Collapsible open={openSections.evidence}>
+            <CollapsibleTrigger 
+              onClick={() => toggleSection('evidence')}
+              className="flex items-center justify-between w-full py-4 hover:text-primary"
+            >
+              <h3 className="font-semibold">Evidence</h3>
+              <ChevronDown className={cn(
+                "h-4 w-4 transition-transform",
+                openSections.evidence ? "transform rotate-0" : "-rotate-90"
+              )} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pb-4">
+              <div className="pt-2">
+                <div className="rounded-lg border p-4">
+                  {evidence.length ? (
+                    <div className="space-y-2">
+                      {evidence.map((evidence) => (
+                        <div key={evidence.id} className="flex items-center gap-2 text-sm hover:bg-muted p-2 rounded-md">
+                          {evidence.type === 'image' ? (
+                            <img 
+                              src={evidence.thumbnail} 
+                              alt={evidence.name}
+                              className="h-8 w-8 object-cover rounded"
+                            />
+                          ) : (
+                            <FileIcon className="h-4 w-4" />
+                          )}
+                          <a href={evidence.url} className="hover:underline">{evidence.name}</a>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-xs text-muted-foreground mt-1">
-                      {message.sender.name} •{' '}
-                      {format(new Date(message.createdAt), 'p')}
-                    </span>
-                  </div>
-                ))}
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No evidence uploaded yet</p>
+                  )}
+                </div>
               </div>
-            </ScrollArea>
+            </CollapsibleContent>
+          </Collapsible>
 
-            <div className="flex gap-2">
-              <Textarea
-                placeholder="Type your message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="min-h-[80px]"
-              />
-              <Button onClick={handleSendMessage}>Send</Button>
-            </div>
-          </div>
+          {/* History Section */}
+          <Collapsible open={openSections.history}>
+            <CollapsibleTrigger 
+              onClick={() => toggleSection('history')}
+              className="flex items-center justify-between w-full py-4 hover:text-primary"
+            >
+              <h3 className="font-semibold">History</h3>
+              <ChevronDown className={cn(
+                "h-4 w-4 transition-transform",
+                openSections.history ? "transform rotate-0" : "-rotate-90"
+              )} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pb-4">
+              <div className="space-y-4 pt-2">
+                {[...caseItem.audit || []].reverse().map((entry) => {
+                  const { icon } = getActionDetails(entry.action);
+                  return (
+                    <div key={entry.id} className="flex gap-3">
+                      <div className="mt-0.5">{icon}</div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{entry.userName}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(entry.timestamp), 'PPpp')}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {entry.details || entry.action.toLowerCase().replace(/_/g, ' ')}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </div>
     </motion.div>
