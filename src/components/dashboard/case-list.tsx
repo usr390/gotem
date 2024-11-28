@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Case } from '@/types';
 import {
@@ -9,10 +9,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  ColumnDef,
+  SortingState,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { SortingState } from '@tanstack/react-table';
-import { cn } from '@/lib/utils';
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 interface CaseListProps {
   cases: Case[];
@@ -21,54 +29,134 @@ interface CaseListProps {
 }
 
 const statusColors = {
-  submitted: 'bg-black-500',
-  review: 'bg-yellow-500',
-  approved: 'bg-green-500',
-  dropped: 'bg-red-500',
+  submitted: 'bg-gray-500 text-white',
+  review: 'bg-yellow-500 text-black',
+  approved: 'bg-green-500 text-white',
+  dropped: 'bg-red-500 text-white',
 };
 
 export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([])
 
-  // Sort the cases
-  const sortedCases = useMemo(() => {
-    return [...cases].sort((a, b) => {
-      const [sort] = sorting;
-      if (!sort) return 0;
+  const columns: ColumnDef<Case>[] = [
+    {
+      accessorKey: "title",
+      header: ({ column }) => (
+        <div
+          className="cursor-pointer flex items-center gap-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Case
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" 
+              ? <ChevronUp className="h-4 w-4" />
+              : <ChevronDown className="h-4 w-4" />
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: ({ column }) => (
+        <div
+          className="cursor-pointer flex items-center gap-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" 
+              ? <ChevronUp className="h-4 w-4" />
+              : <ChevronDown className="h-4 w-4" />
+          )}
+        </div>
+      ),
+      cell: ({ row }) => (
+        <Badge className={statusColors[row.original.status as keyof typeof statusColors]}>
+          {row.original.status}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "submittedBy",
+      header: ({ column }) => (
+        <div
+          className="cursor-pointer flex items-center gap-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Submitted By
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" 
+              ? <ChevronUp className="h-4 w-4" />
+              : <ChevronDown className="h-4 w-4" />
+          )}
+        </div>
+      ),
+      cell: ({ row }) => row.original.submittedBy?.name || 'Unknown User',
+    },
+    {
+      accessorKey: "createdAt",
+      header: ({ column }) => (
+        <div
+          className="cursor-pointer flex items-center gap-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" 
+              ? <ChevronUp className="h-4 w-4" />
+              : <ChevronDown className="h-4 w-4" />
+          )}
+        </div>
+      ),
+      cell: ({ row }) => format(new Date(row.original.createdAt), 'MMM d, yyyy'),
+    },
+    {
+      accessorKey: "submittedAt",
+      header: ({ column }) => (
+        <div
+          className="cursor-pointer flex items-center gap-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Submitted Time
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" 
+              ? <ChevronUp className="h-4 w-4" />
+              : <ChevronDown className="h-4 w-4" />
+          )}
+        </div>
+      ),
+      cell: ({ row }) => format(new Date(row.original.createdAt), 'MMM d, yyyy HH:mm'),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <div
+          className="cursor-pointer flex items-center gap-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Last Updated
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" 
+              ? <ChevronUp className="h-4 w-4" />
+              : <ChevronDown className="h-4 w-4" />
+          )}
+        </div>
+      ),
+      cell: ({ row }) => format(new Date(row.original.updatedAt), 'MMM d, yyyy HH:mm'),
+    },
+  ]
 
-      // Special handling for submittedBy
-      if (sort.id === 'submittedBy') {
-        const aVal = a.submittedBy.name;
-        const bVal = b.submittedBy.name;
-        return sort.desc 
-          ? bVal.localeCompare(aVal) 
-          : aVal.localeCompare(bVal);
-      }
-
-      // Normal sorting for other columns
-      const aVal = String(a[sort.id as keyof Case] ?? '');
-      const bVal = String(b[sort.id as keyof Case] ?? '');
-      return sort.desc 
-        ? bVal.localeCompare(aVal) 
-        : aVal.localeCompare(bVal);
-    });
-  }, [cases, sorting]);
-
-  const toggleSort = (columnId: keyof Case) => {
-    setSorting(current => {
-      // If clicking the same column that's already sorted
-      if (current[0]?.id === columnId) {
-        // If ascending, make it descending
-        if (!current[0].desc) {
-          return [{ id: columnId, desc: true }];
-        }
-        // If descending, remove sort
-        return [];
-      }
-      // New column, set to ascending
-      return [{ id: columnId, desc: false }];
-    });
-  };
+  const table = useReactTable({
+    data: cases,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    enableMultiSort: true,
+  })
 
   return (
     <motion.div
@@ -78,68 +166,53 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     >
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead 
-              onClick={() => toggleSort('title')} 
-              className="cursor-pointer"
-            >
-              Title {sorting[0]?.id === 'title' && (sorting[0]?.desc ? ' ↓' : ' ↑')}
-            </TableHead>
-            <TableHead onClick={() => toggleSort('status')} className="cursor-pointer">
-              Status {sorting[0]?.id === 'status' && (sorting[0]?.desc ? '↓' : '↑')}
-            </TableHead>
-            <TableHead onClick={() => toggleSort('submittedBy')} className="cursor-pointer">
-              Submitted By {sorting[0]?.id === 'submittedBy' && (sorting[0]?.desc ? '↓' : '↑')}
-            </TableHead>
-            <TableHead onClick={() => toggleSort('createdAt')} className="cursor-pointer">
-              Created {sorting[0]?.id === 'createdAt' && (sorting[0]?.desc ? '↓' : '↑')}
-            </TableHead>
-            <TableHead onClick={() => toggleSort('updatedAt')} className="cursor-pointer">
-              Last Updated {sorting[0]?.id === 'updatedAt' && (sorting[0]?.desc ? '↓' : '↑')}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedCases.map((caseItem) => (
-            <TableRow
-              key={caseItem.id}
-              className={cn(
-                "cursor-pointer",
-                selectedCaseId === caseItem.id 
-                  ? "bg-primary/10 hover:bg-primary/20"
-                  : "hover:bg-muted/50"
-              )}
-              onClick={() => onSelectCase(caseItem)}
-              tabIndex={0}
-              role="row"
-              aria-selected={selectedCaseId === caseItem.id}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onSelectCase(caseItem);
-                }
-              }}
-            >
-              <TableCell className="font-medium">{caseItem.title}</TableCell>
-              <TableCell>
-                <Badge
-                  variant="secondary"
-                  className={statusColors[caseItem.status]}
-                >
-                  {caseItem.status.replace('_', ' ').toUpperCase()}
-                </Badge>
-              </TableCell>
-              <TableCell>{caseItem.submittedBy.name}</TableCell>
-              <TableCell>
-                {format(new Date(caseItem.createdAt), 'MMM d, yyyy')}
-              </TableCell>
-              <TableCell>
-                {format(new Date(caseItem.updatedAt), 'MMM d, yyyy')}
-              </TableCell>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                className={cn(
+                  "cursor-pointer",
+                  selectedCaseId === row.original.id 
+                    ? "bg-primary/10 hover:bg-primary/20"
+                    : "hover:bg-muted/50"
+                )}
+                onClick={() => onSelectCase(row.original)}
+                tabIndex={0}
+                role="row"
+                aria-selected={selectedCaseId === row.original.id}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </motion.div>
-  );
+  )
 }
