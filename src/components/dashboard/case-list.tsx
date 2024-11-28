@@ -15,12 +15,21 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface CaseListProps {
   cases: Case[];
@@ -100,23 +109,6 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
           className="cursor-pointer flex items-center gap-2"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Date
-          {column.getIsSorted() && (
-            column.getIsSorted() === "asc" 
-              ? <ChevronUp className="h-4 w-4" />
-              : <ChevronDown className="h-4 w-4" />
-          )}
-        </div>
-      ),
-      cell: ({ row }) => format(new Date(row.original.createdAt), 'MMM d, yyyy'),
-    },
-    {
-      accessorKey: "submittedAt",
-      header: ({ column }) => (
-        <div
-          className="cursor-pointer flex items-center gap-2"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
           Submitted Time
           {column.getIsSorted() && (
             column.getIsSorted() === "asc" 
@@ -126,6 +118,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         </div>
       ),
       cell: ({ row }) => format(new Date(row.original.createdAt), 'MMM d, yyyy HH:mm'),
+      sortingFn: "datetime"
     },
     {
       accessorKey: "updatedAt",
@@ -152,10 +145,16 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
     },
     enableMultiSort: true,
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   })
 
   return (
@@ -213,6 +212,56 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
           )}
         </TableBody>
       </Table>
+
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <span className="text-sm text-muted-foreground">
+          Showing {table.getRowModel().rows.length} of {cases.length} cases
+        </span>
+        <div className="flex-1" />
+        <div className="flex items-center space-x-2">
+          <p className="text-sm font-medium">Rows per page</p>
+          <Select
+            value={`${table.getState().pagination.pageSize}`}
+            onValueChange={(value) => {
+              table.setPageSize(Number(value))
+            }}
+          >
+            <SelectTrigger className="h-8 w-[70px]">
+              <SelectValue placeholder={table.getState().pagination.pageSize} />
+            </SelectTrigger>
+            <SelectContent side="top">
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <SelectItem key={pageSize} value={`${pageSize}`}>
+                  {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+        <span className="flex items-center gap-1">
+          <div>Page</div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} of{' '}
+            {table.getPageCount()}
+          </strong>
+        </span>
+      </div>
     </motion.div>
   )
 }
