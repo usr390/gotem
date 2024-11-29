@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Case } from '@/types';
 import {
@@ -17,11 +17,13 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
   useReactTable,
+  ColumnFiltersState,
+  getFilteredRowModel,
 } from "@tanstack/react-table"
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -30,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 
 interface CaseListProps {
   cases: Case[];
@@ -44,8 +47,56 @@ const statusColors = {
   dropped: 'bg-red-500 text-white',
 };
 
+const TableFilters = ({ table }: { table: any }) => {
+  const [titleFilter, setTitleFilter] = useState('');
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      table.getColumn("title")?.setFilterValue(titleFilter);
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [titleFilter, table]);
+
+  return (
+    <div className="mb-4 flex flex-wrap gap-4">
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Case Title</label>
+        <Input
+          placeholder="Filter cases..."
+          value={titleFilter}
+          onChange={(e) => setTitleFilter(e.target.value)}
+          className="max-w-sm"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Status</label>
+        <Select
+          value={(table.getColumn("status")?.getFilterValue() as string) ?? 'all'}
+          onValueChange={(value) => 
+            table.getColumn("status")?.setFilterValue(value === 'all' ? '' : value)
+          }
+        >
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Filter status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            {Object.keys(statusColors).map(status => (
+              <SelectItem key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+};
+
 export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps) {
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const columns: ColumnDef<Case>[] = [
     {
@@ -55,7 +106,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
           className="cursor-pointer flex items-center gap-2"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Case
+          Case Name
           {column.getIsSorted() && (
             column.getIsSorted() === "asc" 
               ? <ChevronUp className="h-4 w-4" />
@@ -63,6 +114,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
           )}
         </div>
       ),
+      filterFn: 'includesString'
     },
     {
       accessorKey: "status",
@@ -80,10 +132,11 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         </div>
       ),
       cell: ({ row }) => (
-        <Badge className={statusColors[row.original.status as keyof typeof statusColors]}>
-          {row.original.status}
+        <Badge className={cn(statusColors[row.original.status as keyof typeof statusColors])}>
+          {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
         </Badge>
       ),
+      filterFn: 'equals'
     },
     {
       accessorKey: "submittedBy",
@@ -146,13 +199,17 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnFiltersChange: setColumnFilters,
     state: {
       sorting,
+      columnFilters,
     },
     enableMultiSort: true,
+    enableColumnFilters: true,
     initialState: {
       pagination: {
-        pageSize: 10,
+        pageSize: 50,
       },
     },
   })
@@ -163,6 +220,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      <TableFilters table={table} />
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -219,7 +277,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         </span>
         <div className="flex-1" />
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          <p className="text-sm font-medium">Cases per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -230,7 +288,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
+              {[50, 100, 500].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

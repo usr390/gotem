@@ -161,7 +161,7 @@ export function CaseDetails({ caseItem, onClose }: CaseDetailsProps) {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No evidence uploaded yet</p>
+                    <p className="text-sm text-muted-foreground">No evidence uploaded yet (To be connected with AWS GovCloud)</p>
                   )}
                 </div>
               </div>

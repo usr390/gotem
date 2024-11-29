@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Case } from '@/types';
+import { Case, User } from '@/types';
 import { CaseList } from '@/components/dashboard/case-list';
 import { CaseDetails } from '@/components/dashboard/case-details';
 import { MOCK_CASES } from '@/lib/mock-data';
@@ -71,7 +71,7 @@ export function DashboardPage() {
         </Button>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-6 w-full">
         <CaseList 
           cases={cases} 
           onSelectCase={setSelectedCase} 
@@ -93,20 +93,33 @@ export function DashboardPage() {
           <NewCaseForm
             onClose={handleCloseNewCase}
             onSubmit={(formData) => {
+              const timestamp = new Date().toISOString();
+              const submitter: User = {
+                id: "user-1",
+                name: "John Doe",
+                email: "john.doe@police.gov",
+                role: "police_officer",
+                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John"
+              };
+              
               const newCase: Case = {
                 id: crypto.randomUUID(),
                 title: formData.title,
                 description: formData.description,
-                status: 'pending',
-                submittedBy: {
-                  id: "user-1",
-                  name: "John Doe",
-                  email: "john.doe@police.gov",
-                  role: "police_officer",
-                  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John" // optional, can be removed
-                },
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
+                status: 'submitted',
+                submittedBy: submitter,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+                audit: [
+                  {
+                    id: crypto.randomUUID(),
+                    action: 'CASE_SUBMITTED',
+                    timestamp,
+                    userId: submitter.id,
+                    userName: submitter.name,
+                    details: 'Case submitted'
+                  }
+                ]
               };
               setCases([...cases, newCase]);
               handleCloseNewCase();

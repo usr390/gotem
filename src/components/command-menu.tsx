@@ -30,7 +30,7 @@ export function CommandMenu() {
     <>
       <Button
         variant="outline"
-        className="relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-96 lg:w-[500px]"
+        className="relative w-full justify-start text-sm text-muted-foreground sm:pr-12"
         onClick={() => setOpen(true)}
       >
         <Search className="mr-2 h-4 w-4" />

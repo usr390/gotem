@@ -244,7 +244,7 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
             <Input
               autoFocus
               name="title"
-              placeholder="Case title"
+              placeholder="Case name"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="bg-background border-input"
