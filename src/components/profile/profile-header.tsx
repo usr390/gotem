@@ -12,7 +12,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex items-center gap-6"
+      className="flex items-center gap-6 pt-6"
     >
       <Avatar className="h-24 w-24">
         <AvatarImage src={user.avatar} alt={user.name} />

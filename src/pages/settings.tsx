@@ -8,7 +8,7 @@ export function SettingsPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-8"
+      className="space-y-8 pt-6"
     >
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
