@@ -36,6 +36,14 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import { ArchiveIcon, CopyIcon, EyeIcon, TrashIcon } from "lucide-react"
 
 interface CaseListProps {
   cases: Case[];
@@ -164,7 +172,21 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     },
     {
       accessorKey: "submittedBy",
-      header: "Submitted By",
+      header: ({ column }) => {
+        return (
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Submitted By
+            {column.getIsSorted() === "asc" ? (
+              <ChevronUp className="ml-2 h-4 w-4" />
+            ) : column.getIsSorted() === "desc" ? (
+              <ChevronDown className="ml-2 h-4 w-4" />
+            ) : null}
+          </div>
+        )
+      },
       cell: ({ row }) => row.original.submittedBy.name,
       filterFn: (row, id, value) => {
         return row.original.submittedBy.name
@@ -174,7 +196,21 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     },
     {
       accessorKey: "createdAt",
-      header: "Submitted Time",
+      header: ({ column }) => {
+        return (
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Submitted Time
+            {column.getIsSorted() === "asc" ? (
+              <ChevronUp className="ml-2 h-4 w-4" />
+            ) : column.getIsSorted() === "desc" ? (
+              <ChevronDown className="ml-2 h-4 w-4" />
+            ) : null}
+          </div>
+        )
+      },
       cell: ({ row }) => format(new Date(row.getValue("createdAt")), "PPP"),
       filterFn: (row, id, value: { from?: Date; to?: Date } | undefined) => {
         if (!value?.from && !value?.to) return true;
@@ -239,6 +275,11 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     onColumnSizingChange: setColumnSizing,
     columnResizeMode,
   })
+
+  const handleCopyId = (caseId: string) => {
+    navigator.clipboard.writeText(caseId);
+    // Optional: Add a toast notification here
+  };
 
   return (
     <motion.div
@@ -307,25 +348,52 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className={cn(
-                      "cursor-pointer",
-                      selectedCaseId === row.original.id 
-                        ? "bg-primary/10 hover:bg-primary/20"
-                        : "hover:bg-muted/50"
-                    )}
-                    onClick={() => onSelectCase(row.original)}
-                    tabIndex={0}
-                    role="row"
-                    aria-selected={selectedCaseId === row.original.id}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  <ContextMenu key={row.id}>
+                    <ContextMenuTrigger asChild>
+                      <TableRow
+                        data-state={row.getIsSelected() && "selected"}
+                        onClick={() => onSelectCase(row.original)}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent className="w-48">
+                      <ContextMenuItem
+                        onClick={() => onSelectCase(row.original)}
+                        className="flex items-center gap-2"
+                      >
+                        <EyeIcon className="h-4 w-4" />
+                        <span>View Details</span>
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        onClick={() => handleCopyId(row.original.id)}
+                        className="flex items-center gap-2"
+                      >
+                        <CopyIcon className="h-4 w-4" />
+                        <span>Copy Case ID</span>
+                      </ContextMenuItem>
+                      <ContextMenuSeparator />
+                      <ContextMenuItem
+                        className="flex items-center gap-2 text-destructive focus:text-destructive"
+                      >
+                        <ArchiveIcon className="h-4 w-4" />
+                        <span>Archive Case</span>
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        className="flex items-center gap-2 text-destructive focus:text-destructive"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        <span>Delete Case</span>
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
                 ))
               ) : (
                 <TableRow>
