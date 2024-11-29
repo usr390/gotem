@@ -146,7 +146,8 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
           )}
         </div>
       ),
-      filterFn: 'includesString'
+      filterFn: 'includesString',
+      size: 300
     },
     {
       accessorKey: "status",
@@ -164,11 +165,15 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         </div>
       ),
       cell: ({ row }) => (
-        <Badge className={cn(statusColors[row.original.status as keyof typeof statusColors])}>
+        <Badge className={cn(
+          statusColors[row.original.status as keyof typeof statusColors],
+          "w-24 justify-center"
+        )}>
           {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
         </Badge>
       ),
-      filterFn: 'equals'
+      filterFn: 'equals',
+      size: 120
     },
     {
       accessorKey: "submittedBy",
@@ -192,7 +197,8 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         return row.original.submittedBy.name
           .toLowerCase()
           .includes((value as string).toLowerCase())
-      }
+      },
+      size: 200
     },
     {
       accessorKey: "createdAt",
@@ -230,7 +236,8 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
           return date <= adjustedTo;
         }
         return true;
-      }
+      },
+      size: 150
     },
     {
       accessorKey: "updatedAt",
@@ -248,6 +255,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         </div>
       ),
       cell: ({ row }) => format(new Date(row.original.updatedAt), 'MMM d, yyyy HH:mm'),
+      size: 150
     },
   ]
 
