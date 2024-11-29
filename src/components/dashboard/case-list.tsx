@@ -106,7 +106,7 @@ const TableFilters = ({ table }: { table: any }) => {
           <SelectContent side="top">
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="submitted">Submitted</SelectItem>
-            <SelectItem value="review">In Review</SelectItem>
+            <SelectItem value="review">Review</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
             <SelectItem value="dropped">Dropped</SelectItem>
           </SelectContent>
