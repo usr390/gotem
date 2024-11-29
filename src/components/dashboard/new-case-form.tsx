@@ -23,6 +23,7 @@ interface NewCaseFormProps {
     files: FileWithProgress[];
     audit: Audit[];
   }) => Promise<void>;
+  isSubmitting: boolean;
 }
 
 interface FileWithProgress extends File {
@@ -40,7 +41,7 @@ interface Audit {
   details?: string;
 }
 
-export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
+export function NewCaseForm({ onClose, onSubmit, isSubmitting }: NewCaseFormProps) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -143,7 +144,7 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
       console.log('Starting uploads...');
       
       const currentUser = {
-        id: "user-1", // You would get this from your auth context
+        id: "user-1",
         name: "John Doe",
         email: "john.doe@police.gov",
         role: "police_officer",
@@ -166,22 +167,13 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
         ]
       });
       
-      console.log('Upload completed, showing success toast');
-      toast({
-        title: "Case Created",
-        description: "Your case has been successfully created.",
-        duration: 5000,
-        variant: "default",
-      });
-      
-      console.log('Toast called, closing form');
       onClose();
     } catch (error) {
       console.error('Upload failed:', error);
       toast({
         variant: "destructive",
         title: "Upload Failed",
-        description: "Failed to create case",
+        description: "Failed to submit case",
       });
     }
   };
@@ -233,7 +225,7 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create New Case</DialogTitle>
+          <DialogTitle>Submit New Case</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -358,10 +350,19 @@ export function NewCaseForm({ onClose, onSubmit }: NewCaseFormProps) {
           </div>
 
           <div className="flex justify-end space-x-2 pt-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit">Create Case</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit Case'
+              )}
+            </Button>
           </div>
         </form>
       </DialogContent>

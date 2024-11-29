@@ -7,11 +7,50 @@ import { MOCK_CASES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { NewCaseForm } from '@/components/dashboard/new-case-form';
+import { toast } from 'sonner';
+
+const submitCase = async (formData: { title: string; description: string }) => {
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  if (Math.random() < 0.1) {
+    throw new Error('Failed to submit case. Please try again.');
+  }
+
+  const timestamp = new Date().toISOString();
+  const submitter: User = {
+    id: "user-1",
+    name: "John Doe",
+    email: "john.doe@police.gov",
+    role: "police_officer",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John"
+  };
+
+  return {
+    id: crypto.randomUUID(),
+    title: formData.title,
+    description: formData.description,
+    status: 'submitted' as const,
+    submittedBy: submitter,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    audit: [
+      {
+        id: crypto.randomUUID(),
+        action: 'CASE_SUBMITTED',
+        timestamp,
+        userId: submitter.id,
+        userName: submitter.name,
+        details: 'Case submitted'
+      }
+    ]
+  } satisfies Case;
+};
 
 export function DashboardPage() {
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [cases, setCases] = useState<Case[]>(MOCK_CASES);
   const [showNewCaseForm, setShowNewCaseForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const checkHash = () => {
@@ -57,6 +96,21 @@ export function DashboardPage() {
     setShowNewCaseForm(false);
   };
 
+  const handleSubmitCase = async (formData: { title: string; description: string }) => {
+    setIsSubmitting(true);
+    
+    try {
+      const newCase = await submitCase(formData);
+      setCases(prevCases => [...prevCases, newCase]);
+      handleCloseNewCase();
+      toast.success('Case submitted successfully');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6 pt-6">
       <div className="flex justify-between items-center">
@@ -92,38 +146,8 @@ export function DashboardPage() {
         {showNewCaseForm && (
           <NewCaseForm
             onClose={handleCloseNewCase}
-            onSubmit={(formData) => {
-              const timestamp = new Date().toISOString();
-              const submitter: User = {
-                id: "user-1",
-                name: "John Doe",
-                email: "john.doe@police.gov",
-                role: "police_officer",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John"
-              };
-              
-              const newCase: Case = {
-                id: crypto.randomUUID(),
-                title: formData.title,
-                description: formData.description,
-                status: 'submitted',
-                submittedBy: submitter,
-                createdAt: timestamp,
-                updatedAt: timestamp,
-                audit: [
-                  {
-                    id: crypto.randomUUID(),
-                    action: 'CASE_SUBMITTED',
-                    timestamp,
-                    userId: submitter.id,
-                    userName: submitter.name,
-                    details: 'Case submitted'
-                  }
-                ]
-              };
-              setCases([...cases, newCase]);
-              handleCloseNewCase();
-            }}
+            onSubmit={handleSubmitCase}
+            isSubmitting={isSubmitting}
           />
         )}
       </AnimatePresence>

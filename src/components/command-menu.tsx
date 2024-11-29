@@ -57,7 +57,7 @@ export function CommandMenu() {
                   window.location.hash = 'create-new-case';
                   setOpen(false);
                 }}>
-                Create New Case
+                Submit New Case
             </CommandItem>
           </CommandGroup>
 

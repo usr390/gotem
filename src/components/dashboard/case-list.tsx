@@ -61,7 +61,7 @@ const TableFilters = ({ table }: { table: any }) => {
   return (
     <div className="mb-4 flex flex-wrap gap-4">
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Case Title</label>
+        <label className="text-sm font-medium">Case Name</label>
         <Input
           placeholder="Filter cases..."
           value={titleFilter}
