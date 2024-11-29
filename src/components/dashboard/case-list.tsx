@@ -23,7 +23,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { ChevronUp, ChevronDown, X } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 interface CaseListProps {
   cases: Case[];
@@ -49,6 +50,7 @@ const statusColors = {
 
 const TableFilters = ({ table }: { table: any }) => {
   const [titleFilter, setTitleFilter] = useState('');
+  const [submitterFilter, setSubmitterFilter] = useState('');
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -58,35 +60,53 @@ const TableFilters = ({ table }: { table: any }) => {
     return () => clearTimeout(timeoutId);
   }, [titleFilter, table]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      table.getColumn("submittedBy")?.setFilterValue(submitterFilter);
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [submitterFilter, table]);
+
   return (
-    <div className="mb-4 flex flex-wrap gap-4">
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Case Name</label>
+    <div className="flex flex-wrap gap-4">
+      <div className="flex flex-col space-y-1.5">
+        <Label htmlFor="title-filter">Case Name</Label>
         <Input
-          placeholder="Filter cases..."
+          id="title-filter"
+          placeholder="Filter by case name..."
           value={titleFilter}
           onChange={(e) => setTitleFilter(e.target.value)}
-          className="max-w-sm"
+          className="h-8 w-[150px] lg:w-[250px]"
         />
       </div>
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Status</label>
+      
+      <div className="flex flex-col space-y-1.5">
+        <Label htmlFor="submitter-filter">Submitted By</Label>
+        <Input
+          id="submitter-filter"
+          placeholder="Filter by submitter..."
+          value={submitterFilter}
+          onChange={(e) => setSubmitterFilter(e.target.value)}
+          className="h-8 w-[150px] lg:w-[250px]"
+        />
+      </div>
+
+      <div className="flex flex-col space-y-1.5">
+        <Label>Status</Label>
         <Select
-          value={(table.getColumn("status")?.getFilterValue() as string) ?? 'all'}
-          onValueChange={(value) => 
-            table.getColumn("status")?.setFilterValue(value === 'all' ? '' : value)
-          }
+          value={(table.getColumn("status")?.getFilterValue() as string) ?? "all"}
+          onValueChange={(value) => table.getColumn("status")?.setFilterValue(value === "all" ? "" : value)}
         >
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Filter status" />
+          <SelectTrigger className="h-8 w-[150px]">
+            <SelectValue placeholder="All" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent side="top">
             <SelectItem value="all">All</SelectItem>
-            {Object.keys(statusColors).map(status => (
-              <SelectItem key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </SelectItem>
-            ))}
+            <SelectItem value="submitted">Submitted</SelectItem>
+            <SelectItem value="review">In Review</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="dropped">Dropped</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -140,38 +160,37 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     },
     {
       accessorKey: "submittedBy",
-      header: ({ column }) => (
-        <div
-          className="cursor-pointer flex items-center gap-2"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Submitted By
-          {column.getIsSorted() && (
-            column.getIsSorted() === "asc" 
-              ? <ChevronUp className="h-4 w-4" />
-              : <ChevronDown className="h-4 w-4" />
-          )}
-        </div>
-      ),
-      cell: ({ row }) => row.original.submittedBy?.name || 'Unknown User',
+      header: "Submitted By",
+      cell: ({ row }) => row.original.submittedBy.name,
+      filterFn: (row, id, value) => {
+        return row.original.submittedBy.name
+          .toLowerCase()
+          .includes((value as string).toLowerCase())
+      }
     },
     {
       accessorKey: "createdAt",
-      header: ({ column }) => (
-        <div
-          className="cursor-pointer flex items-center gap-2"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Submitted Time
-          {column.getIsSorted() && (
-            column.getIsSorted() === "asc" 
-              ? <ChevronUp className="h-4 w-4" />
-              : <ChevronDown className="h-4 w-4" />
-          )}
-        </div>
-      ),
-      cell: ({ row }) => format(new Date(row.original.createdAt), 'MMM d, yyyy HH:mm'),
-      sortingFn: "datetime"
+      header: "Submitted Time",
+      cell: ({ row }) => format(new Date(row.getValue("createdAt")), "PPP"),
+      filterFn: (row, id, value: { from?: Date; to?: Date } | undefined) => {
+        if (!value?.from && !value?.to) return true;
+
+        const date = new Date(row.getValue("createdAt"));
+        const { from, to } = value || {};
+        
+        const adjustedTo = to ? new Date(to.setHours(23, 59, 59, 999)) : undefined;
+        
+        if (from && adjustedTo) {
+          return date >= from && date <= adjustedTo;
+        }
+        if (from) {
+          return date >= from;
+        }
+        if (adjustedTo) {
+          return date <= adjustedTo;
+        }
+        return true;
+      }
     },
     {
       accessorKey: "updatedAt",
@@ -221,55 +240,60 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
       transition={{ duration: 0.5 }}
     >
       <TableFilters table={table} />
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
+      
+      <div className="mt-4">
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                className={cn(
-                  "cursor-pointer",
-                  selectedCaseId === row.original.id 
-                    ? "bg-primary/10 hover:bg-primary/20"
-                    : "hover:bg-muted/50"
-                )}
-                onClick={() => onSelectCase(row.original)}
-                tabIndex={0}
-                role="row"
-                aria-selected={selectedCaseId === row.original.id}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className={cn(
+                      "cursor-pointer",
+                      selectedCaseId === row.original.id 
+                        ? "bg-primary/10 hover:bg-primary/20"
+                        : "hover:bg-muted/50"
+                    )}
+                    onClick={() => onSelectCase(row.original)}
+                    tabIndex={0}
+                    role="row"
+                    aria-selected={selectedCaseId === row.original.id}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No results.
                   </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <span className="text-sm text-muted-foreground">
