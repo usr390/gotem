@@ -304,22 +304,32 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
                       }}
                     >
                       {header.isPlaceholder ? null : (
-                        <div
-                          {...{
-                            className: header.column.getCanSort()
-                              ? 'cursor-pointer select-none flex items-center'
-                              : '',
-                            onClick: header.column.getToggleSortingHandler(),
-                          }}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        <>
                           <div
                             {...{
-                              onMouseDown: header.getResizeHandler(),
-                              onTouchStart: header.getResizeHandler(),
+                              className: header.column.getCanSort()
+                                ? 'cursor-pointer select-none flex items-center w-[calc(100%-12px)]'
+                                : '',
+                              onClick: header.column.getToggleSortingHandler(),
+                            }}
+                          >
+                            <div className="pr-4">
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                            </div>
+                          </div>
+                          <div
+                            {...{
+                              onMouseDown: (e) => {
+                                e.stopPropagation();
+                                header.getResizeHandler()(e);
+                              },
+                              onTouchStart: (e) => {
+                                e.stopPropagation();
+                                header.getResizeHandler()(e);
+                              },
                               className: `resizer ${
                                 header.column.getIsResizing() ? 'isResizing' : ''
                               }`,
@@ -338,7 +348,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
                               },
                             }}
                           />
-                        </div>
+                        </>
                       )}
                     </TableHead>
                   ))}
