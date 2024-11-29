@@ -19,6 +19,8 @@ import {
   useReactTable,
   ColumnFiltersState,
   getFilteredRowModel,
+  ColumnResizeMode,
+  ColumnSizingState,
 } from "@tanstack/react-table"
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -117,6 +119,8 @@ const TableFilters = ({ table }: { table: any }) => {
 export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
+  const [columnResizeMode] = useState<ColumnResizeMode>('onChange');
 
   const columns: ColumnDef<Case>[] = [
     {
@@ -223,6 +227,7 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
     state: {
       sorting,
       columnFilters,
+      columnSizing,
     },
     enableMultiSort: true,
     enableColumnFilters: true,
@@ -231,6 +236,8 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
         pageSize: 50,
       },
     },
+    onColumnSizingChange: setColumnSizing,
+    columnResizeMode,
   })
 
   return (
@@ -248,13 +255,50 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
+                    <TableHead 
+                      key={header.id}
+                      style={{
+                        width: header.getSize(),
+                        position: 'relative'
+                      }}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          {...{
+                            className: header.column.getCanSort()
+                              ? 'cursor-pointer select-none flex items-center'
+                              : '',
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                        >
+                          {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
+                          <div
+                            {...{
+                              onMouseDown: header.getResizeHandler(),
+                              onTouchStart: header.getResizeHandler(),
+                              className: `resizer ${
+                                header.column.getIsResizing() ? 'isResizing' : ''
+                              }`,
+                              style: {
+                                position: 'absolute',
+                                right: 0,
+                                top: 0,
+                                height: '100%',
+                                width: '4px',
+                                background: header.column.getIsResizing() 
+                                  ? 'rgba(0,0,0,0.3)' 
+                                  : 'rgba(0,0,0,0.0)',
+                                cursor: 'col-resize',
+                                userSelect: 'none',
+                                touchAction: 'none',
+                              },
+                            }}
+                          />
+                        </div>
+                      )}
                     </TableHead>
                   ))}
                 </TableRow>
