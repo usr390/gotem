@@ -35,6 +35,80 @@ export const MOCK_CASES: Case[] = [
         size: 512000,
         uploadedAt: '2024-03-20T10:00:00Z',
         uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '3',
+        name: 'system-diagnostics.txt',
+        url: '#',
+        type: 'text',
+        size: 256000,
+        uploadedAt: '2024-03-20T10:15:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '4',
+        name: 'security-camera-footage.mp4',
+        url: '#',
+        type: 'video',
+        size: 128000000,
+        uploadedAt: '2024-03-20T10:30:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '5',
+        name: 'network-analysis.xlsx',
+        url: '#',
+        type: 'spreadsheet',
+        size: 750000,
+        uploadedAt: '2024-03-20T11:00:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '6',
+        name: 'incident-photos.zip',
+        url: '#',
+        type: 'archive',
+        size: 25000000,
+        uploadedAt: '2024-03-20T11:30:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '7',
+        name: 'maintenance-records.pdf',
+        url: '#',
+        type: 'pdf',
+        thumbnail: 'https://placehold.co/50x50/png?text=PDF',
+        size: 2048000,
+        uploadedAt: '2024-03-20T12:00:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '8',
+        name: 'server-room-access-logs.csv',
+        url: '#',
+        type: 'text',
+        size: 180000,
+        uploadedAt: '2024-03-20T12:30:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '9',
+        name: 'hardware-inventory.docx',
+        url: '#',
+        type: 'document',
+        size: 450000,
+        uploadedAt: '2024-03-20T13:00:00Z',
+        uploadedBy: DEMO_USERS.police
+      },
+      {
+        id: '10',
+        name: 'backup-verification.pdf',
+        url: '#',
+        type: 'pdf',
+        thumbnail: 'https://placehold.co/50x50/png?text=PDF',
+        size: 890000,
+        uploadedAt: '2024-03-20T13:30:00Z',
+        uploadedBy: DEMO_USERS.police
       }
     ],
     audit: [
@@ -52,7 +126,31 @@ export const MOCK_CASES: Case[] = [
         timestamp: '2024-03-20T10:00:00Z',
         userId: '1',
         userName: 'John Doe',
-        details: 'Added server-logs.pdf and error-screenshot.png'
+        details: 'Added initial server logs and error screenshots'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-20T10:30:00Z',
+        userId: '1',
+        userName: 'John Doe',
+        details: 'Added system diagnostics and security footage'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-20T11:30:00Z',
+        userId: '1',
+        userName: 'John Doe',
+        details: 'Added network analysis and incident photos'
+      },
+      {
+        id: crypto.randomUUID(),
+        action: 'FILE_ADDED',
+        timestamp: '2024-03-20T13:30:00Z',
+        userId: '1',
+        userName: 'John Doe',
+        details: 'Added maintenance records and additional documentation'
       }
     ]
   },
