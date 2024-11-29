@@ -352,6 +352,10 @@ export function CaseList({ cases, onSelectCase, selectedCaseId }: CaseListProps)
                     <ContextMenuTrigger asChild>
                       <TableRow
                         data-state={row.getIsSelected() && "selected"}
+                        className={cn(
+                          "transition-colors",
+                          selectedCaseId === row.original.id && "bg-muted hover:bg-muted"
+                        )}
                         onClick={() => onSelectCase(row.original)}
                       >
                         {row.getVisibleCells().map((cell) => (
