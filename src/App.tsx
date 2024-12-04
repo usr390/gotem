@@ -8,6 +8,7 @@ import { SettingsPage } from '@/pages/settings';
 import { MainLayout } from '@/components/layout/main-layout';
 import { useAuth } from '@/contexts/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
+import { SignUpPage } from '@/pages/sign-up';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -22,6 +23,7 @@ export default function App() {
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/sign-up" element={<SignUpPage />} />
             <Route
               path="/dashboard"
               element={

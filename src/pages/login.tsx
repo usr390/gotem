@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
@@ -80,6 +80,18 @@ export function LoginPage() {
               Login as Prosecutor
             </Button>
           </div>
+        </div>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            Don't have an account?{' '}
+            <Link 
+              to="/sign-up"
+              className="text-primary hover:underline"
+            >
+              Sign up here
+            </Link>
+          </p>
         </div>
       </motion.div>
     </div>
