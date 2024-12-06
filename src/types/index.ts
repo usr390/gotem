@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: 'police_officer' | 'prosecutor' | 'admin';
-  avatar?: string;
+  avatar: string | undefined | null;
 }
 
 export interface Case {

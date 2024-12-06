@@ -1,25 +1,43 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/auth-context';
+import { useAuth } from '@/contexts/auth-hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DEMO_USERS } from '@/lib/constants';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email);
-    navigate('/dashboard');
+    setError(null);
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to login');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDemoLogin = (demoEmail: string) => {
-    login(demoEmail);
-    navigate('/dashboard');
+  const handleDemoLogin = async (demoEmail: string) => {
+    setIsLoading(true);
+    try {
+      await login(demoEmail, 'demo-password');
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to login');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -38,7 +56,7 @@ export function LoginPage() {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
-          <div>
+          <div className="space-y-4">
             <Input
               type="email"
               placeholder="Email address"
@@ -46,9 +64,26 @@ export function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full"
             />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full"
+            />
           </div>
-          <Button type="submit" className="w-full">
-            Sign In
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
           </Button>
         </form>
 
@@ -69,15 +104,17 @@ export function LoginPage() {
               variant="outline"
               className="w-full"
               onClick={() => handleDemoLogin(DEMO_USERS.police.email)}
+              disabled={isLoading}
             >
-              Login as Police Officer
+              {isLoading ? 'Signing in...' : 'Login as Police Officer'}
             </Button>
             <Button
               variant="outline"
               className="w-full"
               onClick={() => handleDemoLogin(DEMO_USERS.prosecutor.email)}
+              disabled={isLoading}
             >
-              Login as Prosecutor
+              {isLoading ? 'Signing in...' : 'Login as Prosecutor'}
             </Button>
           </div>
         </div>

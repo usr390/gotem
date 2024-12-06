@@ -6,17 +6,57 @@ import { DashboardPage } from '@/pages/dashboard';
 import { ProfilePage } from '@/pages/profile';
 import { SettingsPage } from '@/pages/settings';
 import { MainLayout } from '@/components/layout/main-layout';
-import { useAuth } from '@/contexts/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SignUpPage } from '@/pages/sign-up';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/contexts/auth-hooks';
 
+// ProtectedRoute Component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" />;
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
   return <MainLayout>{children}</MainLayout>;
 }
 
+// App Component
 export default function App() {
+  const [loadingSession, setLoadingSession] = useState(true);
+
+  // Check and restore session on app initialization
+  useEffect(() => {
+    const restoreSession = async () => {
+      const { data: session, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error restoring session:', error);
+      }
+      setLoadingSession(false);
+    };
+
+    restoreSession();
+  }, []);
+
+  if (loadingSession) {
+    // Optional: Add a loading screen while checking the session
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
   return (
     <ThemeProvider defaultTheme="system" storageKey="ui-theme">
       <Router>

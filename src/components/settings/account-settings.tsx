@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/auth-context';
+import { useAuth } from '@/contexts/auth-hooks';
 import { toast } from 'sonner';
 
 const accountSchema = z.object({
